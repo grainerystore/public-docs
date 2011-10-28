@@ -1,0 +1,63 @@
+#!/bin/bash
+function usage { cat <<EOF
+document-repo: Manages the documents repository.
+
+Actions:
+
+    update:  Commit any changes to the repository.
+    push:    Push any new revisions to the public backup.
+
+Options:
+
+    -l LOGFILE:  selects the log file.  Defaults to standard out.
+EOF
+}
+
+REPO_DIR=~/documents;
+
+function die {  # RETURN_CODE MESSAGE EXIT_STATUS
+  echo "document-repo: Dying because of return code $1 while $2." >&2;
+  exit $3;
+}
+
+function update {
+  cd "$REPO_DIR" || die $? "entering repo dir \"$REPO_DIR\"" 2;
+  git diff --quiet || git commit . -m 'scripted update.' || die $? "committing to repo" 3;
+}
+
+function push {
+  cd "$REPO_DIR" || die $? "entering repo dir \"$REPO_DIR\"" 3;
+  # For this one we don't care if it succeeds:
+  #   the network might be down or something, and we can just retry later.
+  git push github-public;
+}
+
+function log-init {
+  echo "----------------";
+  date --rfc-3339=s | tr \  T;
+  echo "starting $1 action...";
+}
+
+# half-assed attempt at proper logging.
+function log-do {
+  if [[ $LOGFILE ]]; then
+    exec >> "$LOGFILE" 2>> "$LOGFILE.err";
+    log-init $1;
+  fi;
+  $1;
+  local ret=$?
+  if [[ $LOGFILE ]]; then
+    echo "Return value: $ret";
+  fi;
+}
+
+while [[ $1 ]]; do
+  case "$1" in
+    -l)     shift; LOGFILE="$1"; shift;;
+    update) ACTION=update; shift;;
+    push)   ACTION=push;   shift;;
+    *)      { echo "Unsupported action \"$1\"."; usage; exit 1; } >&2;;
+  esac;
+done;
+
+log-do $ACTION;
