@@ -355,3 +355,7 @@
       \ | endif
     command! Frenchout Frenchoff
     command! English Frenchoff
+
+
+" stuff specific to the grainery pc or to running under cygwin
+colorscheme zellner
