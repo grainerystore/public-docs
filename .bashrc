@@ -127,3 +127,11 @@ unset TEMP
 
 # Some example functions
 # function settitle() { echo -ne "\e]2;$@\a\e]1;$@\a"; }
+
+
+##*******## non-template stuff starts here
+
+# Add the home bin directory to the PATH
+if echo "$PATH" | grep -vq '/home/[^:]*/bin'; then
+  PATH+=:~/bin;
+fi;
