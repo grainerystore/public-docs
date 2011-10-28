@@ -13,7 +13,7 @@ Options:
 EOF
 }
 
-REPO_DIR=~/documents;
+REPO_DIR=/cygdrive/c/Documents\ and\ Settings/Grainery;
 
 function die {  # RETURN_CODE MESSAGE EXIT_STATUS
   echo "document-repo: Dying because of return code $1 while $2." >&2;
